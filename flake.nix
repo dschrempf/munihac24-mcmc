@@ -54,7 +54,7 @@
             ];
             buildInputs = [ ];
             doBenchmark = true;
-            # withHoogle = true;
+            withHoogle = true;
           };
         };
     in
