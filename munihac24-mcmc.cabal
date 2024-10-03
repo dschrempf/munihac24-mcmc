@@ -15,9 +15,6 @@ license:            GPL-3.0-or-later
 license-file:       License.txt
 build-type:         Simple
 extra-doc-files:
-  Changelog.md
-  Readme.md
-
 extra-source-files:
 data-files:
 
@@ -28,20 +25,8 @@ source-repository head
 common common
   default-extensions:
 
-common lib
-  default-language: GHC2021
-  ghc-options:      -Wall -Wunused-packages -Wredundant-constraints
-
-common test
-  default-language: GHC2021
-  ghc-options:      -Wall -Wunused-packages -Wredundant-constraints
-
-common bench
-  default-language: GHC2021
-  ghc-options:      -Wall -Wunused-packages -Wredundant-constraints
-
 common exec
   default-language: GHC2021
   ghc-options:
-    -Wall -Wunused-packages -Wredundant-constraints
-    -threaded -rtsopts -with-rtsopts=-N
+    -Wall -Wunused-packages -Wredundant-constraints -threaded -rtsopts
+    -with-rtsopts=-N
