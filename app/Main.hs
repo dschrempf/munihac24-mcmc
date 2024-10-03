@@ -17,4 +17,4 @@ where
 import Data (loadTemperatures)
 
 main :: IO ()
-main = loadTemperatures
+main = loadTemperatures >>= print

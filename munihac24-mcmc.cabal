@@ -50,7 +50,12 @@ library
   other-modules:
   autogen-modules:
   ghc-options:
-  build-depends:   base >=4.7 && <5
+  build-depends:
+    , base        >=4.7 && <5
+    , bytestring
+    , cassava
+    , text
+    , vector
 
 executable mcmc
   import:          common, exec
