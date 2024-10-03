@@ -30,3 +30,14 @@ common exec
   ghc-options:
     -Wall -Wunused-packages -Wredundant-constraints -threaded -rtsopts
     -with-rtsopts=-N
+
+executable mcmc
+  import:          common, exec
+  main-is:         Main.hs
+  hs-source-dirs:  app
+  other-modules:
+  autogen-modules:
+  ghc-options:
+  build-depends:
+    , base  >=4.7 && <5
+    , mcmc
