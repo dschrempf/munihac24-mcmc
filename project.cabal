@@ -1,0 +1,47 @@
+cabal-version:      3.4
+name:               munihac24-mcmc
+version:            0.1.0.0
+synopsis:           Estimate parameters using MCMC algorithms and Haskell
+description:
+  Please see the README at <https://github.com/dschrempf/munihac24-mcmc#readme>
+
+category:           Math, Statistics
+homepage:           https://github.com/dschrempf/munihac24-mcmc#readme
+bug-reports:        https://github.com/dschrempf/munihac24-mcmc/issues
+author:             Dominik Schrempf
+maintainer:         dominik.schrempf@gmail.com
+copyright:          2024 Dominik Schrempf
+license:            GPL-3.0-or-later
+license-file:       License.txt
+build-type:         Simple
+extra-doc-files:
+  Changelog.md
+  Readme.md
+
+extra-source-files:
+data-files:
+
+source-repository head
+  location: https://github.com/dschrempf/munihac24-mcmc
+  type:     git
+
+common common
+  default-extensions:
+
+common lib
+  default-language: GHC2021
+  ghc-options:      -Wall -Wunused-packages -Wredundant-constraints
+
+common test
+  default-language: GHC2021
+  ghc-options:      -Wall -Wunused-packages -Wredundant-constraints
+
+common bench
+  default-language: GHC2021
+  ghc-options:      -Wall -Wunused-packages -Wredundant-constraints
+
+common exec
+  default-language: GHC2021
+  ghc-options:
+    -Wall -Wunused-packages -Wredundant-constraints
+    -threaded -rtsopts -with-rtsopts=-N
