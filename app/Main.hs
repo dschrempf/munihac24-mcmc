@@ -14,5 +14,7 @@ module Main
   )
 where
 
+import Data (loadTemperatures)
+
 main :: IO ()
-main = undefined
+main = loadTemperatures
