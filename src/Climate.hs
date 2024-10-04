@@ -14,10 +14,11 @@
 module Climate (sample) where
 
 import Control.Lens (makeLenses)
+import Control.Monad (void)
 import Data (ClimateData (..), DataPoint (..))
 import Data.Aeson.TH (defaultOptions, deriveJSON)
 import Data.Vector qualified as V
-import Mcmc (AnalysisName (..), BurnInSettings (..), Cycle, ExecutionMode (..), Iterations (..), LikelihoodFunctionG, Log, LogMode (..), MHG, Monitor (..), MonitorFile, MonitorParameter, MonitorStdOut, PName (..), ParallelizationMode (..), PriorFunctionG, SaveMode (..), Settings (..), TraceLength (..), Tune (..), Verbosity (..), cycleFromList, mcmc, mhg, monitorDouble, monitorFile, monitorStdOut, normal, pWeight, product', scaleUnbiased, slideSymmetric, (>$<), (@~))
+import Mcmc
 import System.Random (newStdGen)
 
 -- | The state of the Markov chain is a set of parameters used to describe the
@@ -58,7 +59,7 @@ type I = IG Double
 
 -- | Initial state.
 i0 :: I
-i0 = IG {_tMeanBase = 10, _tMeanChange = 0, _tStdDev = 1}
+i0 = IG {_tMeanBase = 10, _tMeanChange = 0, _tStdDev = 10}
 
 -- | Prior function.
 --
@@ -66,8 +67,8 @@ i0 = IG {_tMeanBase = 10, _tMeanChange = 0, _tStdDev = 1}
 pr :: (RealFloat a) => PriorFunctionG (IG a) a
 pr (IG tb tc ts) =
   product'
-    [ normal 10.0 5.0 tb,
-      normal 0 1.0 tc,
+    [ uniform (-10) 20 tb,
+      normal 0 1 tc,
       normal 10 10 ts
     ]
 
@@ -90,9 +91,9 @@ lh (ClimateData xs) x = V.product $ V.map (lhDay x) xs
 cc :: Cycle I
 cc =
   cycleFromList
-    [ tMeanBase @~ slideSymmetric 1.0 (PName "tMeanBase") (pWeight 1) Tune,
-      tMeanChange @~ slideSymmetric 1.0 (PName "tMeanChange") (pWeight 1) Tune,
-      tStdDev @~ scaleUnbiased 1.0 (PName "cStdDev") (pWeight 1) Tune
+    [ tMeanBase @~ slideSymmetric 1 (PName "tMeanBase") (pWeight 1) Tune,
+      tMeanChange @~ slideSymmetric 0.1 (PName "tMeanChange") (pWeight 1) Tune,
+      tStdDev @~ scaleUnbiased 1 (PName "cStdDev") (pWeight 1) Tune
     ]
 
 -- | Monitor all parameters.
@@ -115,9 +116,9 @@ mon :: Monitor I
 mon = Monitor monStd [monFile] []
 
 nIterations :: Int
-nIterations = 5000
+nIterations = 20000
 
-sample :: ClimateData -> IO (MHG I)
+sample :: ClimateData -> IO ()
 sample d = do
   g <- newStdGen
   -- Settings of the Metropolis-Hastings-Green (MHG) algorithm.
@@ -129,10 +130,13 @@ sample d = do
           (TraceMinimum nIterations)
           Overwrite
           Sequential
-          NoSave
-          LogStdOutOnly
+          Save
+          LogStdOutAndFile
           Info
   -- Use the MHG (Metropolis-Hastings-Green) algorithm.
   a <- mhg s pr (lh d) cc mon i0 g
+  -- -- Or, use the MC3 algorithm.
+  -- let mc3S = MC3Settings (NChains 4) (SwapPeriod 4) (NSwaps 1)
+  -- a <- mc3 mc3S s pr (lh d) cc mon i0 g
   -- Run the MCMC sampler.
-  mcmc s a
+  void $ mcmc s a

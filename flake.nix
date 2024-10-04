@@ -5,11 +5,19 @@
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+  inputs.mcmc.url = "github:dschrempf/mcmc";
+  inputs.mcmc.inputs.nixpkgs.follows = "nixpkgs";
+
+  inputs.dschrempf-nur.url = "github:dschrempf/nur-packages";
+  inputs.dschrempf-nur.inputs.nixpkgs.follows = "nixpkgs";
+
   outputs =
     {
       self,
       flake-utils,
       nixpkgs,
+      mcmc,
+      dschrempf-nur,
     }:
     let
       theseHpkgNames = [
@@ -26,7 +34,10 @@
             };
         };
       };
-      overlays = [ hOverlay ];
+      overlays = [
+        hOverlay
+        mcmc.overlays.default
+      ];
       perSystem =
         system:
         let
@@ -38,6 +49,7 @@
           hlib = pkgs.haskell.lib;
           theseHpkgs = nixpkgs.lib.genAttrs theseHpkgNames (n: hpkgs.${n});
           theseHpkgsDev = builtins.mapAttrs (_: x: hlib.doBenchmark x) theseHpkgs;
+          dschrempf = dschrempf-nur.packages.${system};
         in
         {
           packages = theseHpkgs // {
@@ -52,7 +64,7 @@
               hpkgs.cabal-install
               hpkgs.haskell-language-server
             ];
-            buildInputs = [ ];
+            buildInputs = [ dschrempf.tracer ];
             # doBenchmark = true;
             # withHoogle = true;
           };

@@ -1,4 +1,6 @@
 /.direnv/
+/*.monitor
+/climate.mcmc.*
 
 dist
 dist-*
@@ -24,4 +26,3 @@ cabal.project.local~
 .HTF/
 .ghc.environment.*
 
-/*.monitor
