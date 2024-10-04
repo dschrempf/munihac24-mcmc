@@ -12,6 +12,7 @@
 module Data
   ( loadTemperatures,
     DataPoint (..),
+    ClimateData (..),
   )
 where
 
@@ -44,7 +45,9 @@ fromRaw x = case _meanTotR x of
   Nothing -> Nothing
   Just t -> Just $ DataPoint (_indexR x) (_dateR x) t
 
-loadTemperatures :: IO (Vector DataPoint)
+newtype ClimateData = ClimateData {getClimateData :: Vector DataPoint}
+
+loadTemperatures :: IO ClimateData
 loadTemperatures = do
   f <- BS.readFile "weather-data.csv"
   let xsRaw = either error id $ decode HasHeader f
@@ -55,4 +58,4 @@ loadTemperatures = do
     putStrLn $ "Number of raw measurements: " <> show lXsRaw
     putStrLn $ "Number of OK  measurements: " <> show lXs
     putStrLn $ "Removed " <> show (lXsRaw - lXs) <> " measurements"
-  pure xs
+  pure $ ClimateData xs

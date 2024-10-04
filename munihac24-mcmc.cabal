@@ -46,17 +46,21 @@ common bench
 library
   import:          common, lib
   exposed-modules:
+    Climate
     Data
-    Mcmc
 
   hs-source-dirs:  src
   other-modules:
   autogen-modules:
   ghc-options:
   build-depends:
+    , aeson
     , base        >=4.7 && <5
     , bytestring
     , cassava
+    , lens
+    , mcmc
+    , random
     , text
     , vector
 
@@ -69,5 +73,4 @@ executable mcmc
   ghc-options:
   build-depends:
     , base            >=4.7 && <5
-    , mcmc
     , munihac24-mcmc

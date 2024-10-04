@@ -14,7 +14,11 @@ module Main
   )
 where
 
+import Climate (sample)
+import Control.Monad (void)
 import Data (loadTemperatures)
 
 main :: IO ()
-main = loadTemperatures >>= print
+main = do
+  d <- loadTemperatures
+  void $ sample d

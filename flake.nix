@@ -53,8 +53,8 @@
               hpkgs.haskell-language-server
             ];
             buildInputs = [ ];
-            doBenchmark = true;
-            withHoogle = true;
+            # doBenchmark = true;
+            # withHoogle = true;
           };
         };
     in
