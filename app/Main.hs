@@ -16,9 +16,9 @@ where
 
 import Climate (sample)
 import Control.Monad (void)
-import Data (loadTemperatures)
+import Data (loadClimateData)
 
 main :: IO ()
 main = do
-  d <- loadTemperatures
+  d <- loadClimateData
   void $ sample d

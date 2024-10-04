@@ -116,7 +116,7 @@ mon :: Monitor I
 mon = Monitor monStd [monFile] []
 
 nIterations :: Int
-nIterations = 20000
+nIterations = 5000
 
 sample :: ClimateData -> IO ()
 sample d = do
@@ -125,7 +125,7 @@ sample d = do
   let s =
         Settings
           (AnalysisName "climate")
-          (BurnInWithAutoTuning 2000 100)
+          (BurnInWithAutoTuning 1500 100)
           (Iterations nIterations)
           (TraceMinimum nIterations)
           Overwrite

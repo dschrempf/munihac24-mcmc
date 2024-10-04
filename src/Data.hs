@@ -10,7 +10,7 @@
 --
 -- Creation date: Thu Oct  3 18:14:21 2024.
 module Data
-  ( loadTemperatures,
+  ( loadClimateData,
     DataPoint (..),
     ClimateData (..),
   )
@@ -47,8 +47,8 @@ fromRaw x = case _meanTotR x of
 
 newtype ClimateData = ClimateData {getClimateData :: Vector DataPoint}
 
-loadTemperatures :: IO ClimateData
-loadTemperatures = do
+loadClimateData :: IO ClimateData
+loadClimateData = do
   f <- BS.readFile "weather-data.csv"
   let xsRaw = either error id $ decode HasHeader f
       xs = V.mapMaybe fromRaw xsRaw
