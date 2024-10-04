@@ -49,7 +49,7 @@ newtype ClimateData = ClimateData {getClimateData :: Vector DataPoint}
 
 loadClimateData :: IO ClimateData
 loadClimateData = do
-  f <- BS.readFile "weather-data.csv"
+  f <- BS.readFile "climate-data.csv"
   let xsRaw = either error id $ decode HasHeader f
       xs = V.mapMaybe fromRaw xsRaw
       lXsRaw = V.length xsRaw

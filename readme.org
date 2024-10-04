@@ -1,3 +1,3 @@
-The weather data downloaded from [[https://www.geosphere.at/de][Geosphere Austria]]. The data set is called
-[[https://data.hub.geosphere.at/en/dataset/klima-v2-1m][Messstationen Monatsdaten v2]] and licensed under the [[https://creativecommons.org/licenses/by/4.0/][Creative Commons Attribution
-4.0]] (CC BY 4.0).
+I have downloaded the climate data from [[https://www.geosphere.at/de][Geosphere Austria]]. The data set is
+called [[https://data.hub.geosphere.at/en/dataset/klima-v2-1m][Messstationen Monatsdaten v2]] and licensed under the [[https://creativecommons.org/licenses/by/4.0/][Creative Commons
+Attribution 4.0]] (CC BY 4.0).
