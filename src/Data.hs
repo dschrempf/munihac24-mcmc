@@ -9,12 +9,18 @@
 -- Portability :  portable
 --
 -- Creation date: Thu Oct  3 18:14:21 2024.
-module Data (loadTemperatures) where
+module Data
+  ( loadTemperatures,
+    DataPoint (..),
+  )
+where
 
+import Control.Monad (when)
 import Data.ByteString.Lazy as BS
 import Data.Csv (FromRecord, HasHeader (HasHeader), decode)
 import Data.Text (Text)
 import Data.Vector (Vector)
+import Data.Vector qualified as V
 import GHC.Generics
 
 data DataPointRaw = DataPointRaw
@@ -30,7 +36,26 @@ data DataPointRaw = DataPointRaw
 
 instance FromRecord DataPointRaw
 
-loadTemperatures :: IO (Vector DataPointRaw)
+data DataPoint = DataPoint
+  { date :: !Text,
+    meanTot :: !Double
+  }
+  deriving (Show)
+
+fromRaw :: DataPointRaw -> Maybe DataPoint
+fromRaw d = case _meanTotR d of
+  Nothing -> Nothing
+  Just t -> Just $ DataPoint (_dateR d) t
+
+loadTemperatures :: IO (Vector DataPoint)
 loadTemperatures = do
   f <- BS.readFile "temperatures.csv"
-  pure $ either error id $ decode HasHeader f
+  let xsRaw = either error id $ decode HasHeader f
+      xs = V.mapMaybe fromRaw xsRaw
+      lXsRaw = V.length xsRaw
+      lXs = V.length xs
+  when (lXsRaw > lXs) $ do
+    putStrLn $ "Number of raw measurements: " <> show lXsRaw
+    putStrLn $ "Number of OK  measurements: " <> show lXs
+    putStrLn $ "Removed " <> show (lXsRaw - lXs) <> " measurements"
+  pure xs

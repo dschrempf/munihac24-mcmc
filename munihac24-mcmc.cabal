@@ -45,7 +45,10 @@ common bench
 
 library
   import:          common, lib
-  exposed-modules: Data
+  exposed-modules:
+    Data
+    Mcmc
+
   hs-source-dirs:  src
   other-modules:
   autogen-modules:
