@@ -24,32 +24,29 @@ import Data.Vector qualified as V
 import GHC.Generics
 
 data DataPointRaw = DataPointRaw
-  { _dateR :: !Text,
-    _stationR :: !Int,
-    _meanTotR :: !(Maybe Double),
-    _mean7amR :: !(Maybe Double),
-    _mean2pmR :: !(Maybe Double),
-    _mean7pmR :: !(Maybe Double),
-    _subStatR :: !(Maybe Int)
+  { _indexR :: !Int,
+    _dateR :: !Text,
+    _meanTotR :: !(Maybe Double)
   }
   deriving (Show, Generic)
 
 instance FromRecord DataPointRaw
 
 data DataPoint = DataPoint
-  { date :: !Text,
+  { index :: !Int,
+    date :: !Text,
     meanTot :: !Double
   }
   deriving (Show)
 
 fromRaw :: DataPointRaw -> Maybe DataPoint
-fromRaw d = case _meanTotR d of
+fromRaw x = case _meanTotR x of
   Nothing -> Nothing
-  Just t -> Just $ DataPoint (_dateR d) t
+  Just t -> Just $ DataPoint (_indexR x) (_dateR x) t
 
 loadTemperatures :: IO (Vector DataPoint)
 loadTemperatures = do
-  f <- BS.readFile "temperatures.csv"
+  f <- BS.readFile "weather-data.csv"
   let xsRaw = either error id $ decode HasHeader f
       xs = V.mapMaybe fromRaw xsRaw
       lXsRaw = V.length xsRaw
