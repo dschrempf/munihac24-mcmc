@@ -17,7 +17,7 @@ import Control.Lens (makeLenses)
 import Data (ClimateData (..), DataPoint (..))
 import Data.Aeson.TH (defaultOptions, deriveJSON)
 import Data.Vector qualified as V
-import Mcmc (AnalysisName (..), BurnInSettings (..), Cycle, ExecutionMode (..), Iterations (..), LikelihoodFunctionG, Log, LogMode (..), MHG, Monitor (..), MonitorStdOut, PName (..), ParallelizationMode (..), PriorFunctionG, SaveMode (..), Settings (..), TraceLength (..), Tune (..), Verbosity (..), cycleFromList, mcmc, mhg, monitorDouble, monitorStdOut, normal, pWeight, product', scaleUnbiased, slideSymmetric, (>$<), (@~))
+import Mcmc (AnalysisName (..), BurnInSettings (..), Cycle, ExecutionMode (..), Iterations (..), LikelihoodFunctionG, Log, LogMode (..), MHG, Monitor (..), MonitorFile, MonitorParameter, MonitorStdOut, PName (..), ParallelizationMode (..), PriorFunctionG, SaveMode (..), Settings (..), TraceLength (..), Tune (..), Verbosity (..), cycleFromList, mcmc, mhg, monitorDouble, monitorFile, monitorStdOut, normal, pWeight, product', scaleUnbiased, slideSymmetric, (>$<), (@~))
 import System.Random (newStdGen)
 
 -- | The state of the Markov chain is a set of parameters used to describe the
@@ -95,21 +95,27 @@ cc =
       tStdDev @~ scaleUnbiased 1.0 (PName "cStdDev") (pWeight 1) Tune
     ]
 
--- | Monitor some parameters to standard output.
+-- | Monitor all parameters.
+monAllParams :: [MonitorParameter I]
+monAllParams =
+  [ _tMeanBase >$< monitorDouble "tMeanBase",
+    _tMeanChange >$< monitorDouble "tMeanChange",
+    _tStdDev >$< monitorDouble "tStdDev"
+  ]
+
+-- | Monitor all parameters to standard output.
 monStd :: MonitorStdOut I
-monStd =
-  monitorStdOut
-    [ _tMeanBase >$< monitorDouble "cMean",
-      _tMeanChange >$< monitorDouble "pMean",
-      _tStdDev >$< monitorDouble "tMean"
-    ]
-    3
+monStd = monitorStdOut monAllParams 5
+
+-- | Monitor all parameters to a file. Sample parameters more often.
+monFile :: MonitorFile I
+monFile = monitorFile "all" monAllParams 2
 
 mon :: Monitor I
-mon = Monitor monStd [] []
+mon = Monitor monStd [monFile] []
 
 nIterations :: Int
-nIterations = 2000
+nIterations = 5000
 
 sample :: ClimateData -> IO (MHG I)
 sample d = do
@@ -117,8 +123,8 @@ sample d = do
   -- Settings of the Metropolis-Hastings-Green (MHG) algorithm.
   let s =
         Settings
-          (AnalysisName "ClimateForecast")
-          (BurnInWithAutoTuning 1000 100)
+          (AnalysisName "climate")
+          (BurnInWithAutoTuning 2000 100)
           (Iterations nIterations)
           (TraceMinimum nIterations)
           Overwrite
