@@ -139,7 +139,7 @@ sample d = do
   a <- mhg settings pr (lh d) cc mon i0 g
   -- -- Or, use the MC3 algorithm.
   -- let mc3S = MC3Settings (NChains 4) (SwapPeriod 4) (NSwaps 1)
-  -- a <- mc3 mc3S s pr (lh d) cc mon i0 g
+  -- a <- mc3 mc3S settings pr (lh d) cc mon i0 g
   -- Run the MCMC sampler.
   void $ mcmc settings a
 
