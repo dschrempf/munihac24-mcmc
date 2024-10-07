@@ -19,7 +19,7 @@ import Data (ClimateData (..), DataPoint (..))
 import Data.Aeson.TH (defaultOptions, deriveJSON)
 import Data.Vector qualified as V
 import Mcmc
-import System.Random (newStdGen)
+import System.Random (mkStdGen)
 
 -- | The state of the Markov chain is a set of parameters used to describe the
 -- climate data.
@@ -133,7 +133,7 @@ settings =
 
 sample :: ClimateData -> IO ()
 sample d = do
-  g <- newStdGen
+  let g = mkStdGen 42
   -- Settings of the Metropolis-Hastings-Green (MHG) algorithm.
   -- Use the MHG (Metropolis-Hastings-Green) algorithm.
   a <- mhg settings pr (lh d) cc mon i0 g
