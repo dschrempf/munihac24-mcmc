@@ -11,7 +11,7 @@
 -- Portability :  portable
 --
 -- Creation date: Fri Oct  4 10:35:00 2024.
-module Climate (sample) where
+module Climate (sample, continue) where
 
 import Control.Lens (makeLenses)
 import Control.Monad (void)
@@ -118,25 +118,33 @@ mon = Monitor monStd [monFile] []
 nIterations :: Int
 nIterations = 5000
 
+settings :: Settings
+settings =
+  Settings
+    (AnalysisName "climate")
+    (BurnInWithAutoTuning 1500 100)
+    (Iterations nIterations)
+    (TraceMinimum nIterations)
+    Overwrite
+    Sequential
+    Save
+    LogStdOutAndFile
+    Info
+
 sample :: ClimateData -> IO ()
 sample d = do
   g <- newStdGen
   -- Settings of the Metropolis-Hastings-Green (MHG) algorithm.
-  let s =
-        Settings
-          (AnalysisName "climate")
-          (BurnInWithAutoTuning 1500 100)
-          (Iterations nIterations)
-          (TraceMinimum nIterations)
-          Overwrite
-          Sequential
-          Save
-          LogStdOutAndFile
-          Info
   -- Use the MHG (Metropolis-Hastings-Green) algorithm.
-  a <- mhg s pr (lh d) cc mon i0 g
+  a <- mhg settings pr (lh d) cc mon i0 g
   -- -- Or, use the MC3 algorithm.
   -- let mc3S = MC3Settings (NChains 4) (SwapPeriod 4) (NSwaps 1)
   -- a <- mc3 mc3S s pr (lh d) cc mon i0 g
   -- Run the MCMC sampler.
-  void $ mcmc s a
+  void $ mcmc settings a
+
+continue :: ClimateData -> IO ()
+continue d = do
+  a <- mhgLoad pr (lh d) cc mon (AnalysisName "climate")
+  -- a <- mc3Load pr (lh d) cc mon (AnalysisName "climate")
+  void $ mcmcContinue (Iterations 50000) settings a

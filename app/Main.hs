@@ -14,9 +14,9 @@ module Main
   )
 where
 
-import Climate (sample)
+import Climate
 import Control.Monad (void)
-import Data (loadClimateData)
+import Data
 
 main :: IO ()
 main = do
