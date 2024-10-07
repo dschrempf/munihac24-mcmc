@@ -65,8 +65,8 @@
               hpkgs.haskell-language-server
             ];
             buildInputs = [ dschrempf.tracer ];
-            # doBenchmark = true;
-            # withHoogle = true;
+            doBenchmark = true;
+            withHoogle = true;
           };
         };
     in
