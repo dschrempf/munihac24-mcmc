@@ -1,6 +1,6 @@
 /.direnv/
-/*.monitor
-/climate.mcmc.*
+/**/*.monitor
+/**/climate.mcmc.*
 
 dist
 dist-*
