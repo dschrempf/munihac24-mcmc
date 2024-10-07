@@ -24,10 +24,6 @@ import System.Random (mkStdGen)
 -- | The state of the Markov chain is a set of parameters used to describe the
 -- climate data.
 --
--- The type parameter will be instantiated to 'Double', but 'mcmc' can also find
--- proposals using automatic differentation which requires a more general type.
--- We will most likely not use this feature in the MuniHac24 workshop.
---
 -- For example, we use a linear regression model for the mean temperature
 --
 --    t = base + change * x,
@@ -39,33 +35,30 @@ import System.Random (mkStdGen)
 -- - 'x' is the running index from 0 to n with 'n' being the number of observations;
 --
 -- - 'change' is the change of temperature with time.
-data IG a = IG
+data I = I
   { -- Temperature mean (constant and change) and standard deviation in degree
     -- celsius of temperature.
-    _tMeanBase :: !a,
-    _tMeanChange :: !a,
-    _tStdDev :: !a
+    _tMeanBase :: !Double,
+    _tMeanChange :: !Double,
+    _tStdDev :: !Double
   }
   deriving (Show)
 
 -- We use JSON to store the trace of the Markov chain.
-$(deriveJSON defaultOptions ''IG)
+$(deriveJSON defaultOptions ''I)
 
 -- Proposals changing individual values use lenses to modify the state.
-makeLenses ''IG
-
--- | The state space specialized to 'Double'.
-type I = IG Double
+makeLenses ''I
 
 -- | Initial state.
 i0 :: I
-i0 = IG {_tMeanBase = 10, _tMeanChange = 0, _tStdDev = 10}
+i0 = I {_tMeanBase = 10, _tMeanChange = 0, _tStdDev = 10}
 
 -- | Prior function.
 --
 -- > type PriorFunctionG a b = a -> Log b
-pr :: (RealFloat a) => PriorFunctionG (IG a) a
-pr (IG tb tc ts) =
+pr :: PriorFunction I
+pr (I tb tc ts) =
   product'
     [ uniform (-10) 20 tb,
       normal 0 1 tc,
@@ -75,17 +68,16 @@ pr (IG tb tc ts) =
 -- | For a given set of parameters, calculate the likelihood of observing
 -- climate data at a specific day.
 lhDay ::
-  (RealFloat a) =>
-  IG a ->
+  I ->
   DataPoint ->
-  Log a
-lhDay (IG tb tc ts) (DataPoint i _ t) =
+  Log Double
+lhDay (I tb tc ts) (DataPoint i _ t) =
   normal (tb + fromIntegral i * tc) ts (realToFrac t)
 
 -- | Likelihood function.
 --
 -- > type LikelihoodFunctionG a b = a -> Log b
-lh :: (RealFloat a) => ClimateData -> LikelihoodFunctionG (IG a) a
+lh :: ClimateData -> LikelihoodFunction I
 lh (ClimateData xs) x = V.product $ V.map (lhDay x) xs
 
 cc :: Cycle I
