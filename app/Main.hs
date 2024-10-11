@@ -15,10 +15,7 @@ module Main
 where
 
 import Climate
-import Control.Monad (void)
 import Data
 
 main :: IO ()
-main = do
-  d <- loadClimateData
-  void $ sample d
+main = loadClimateData >>= sample

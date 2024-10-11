@@ -26,18 +26,18 @@ import System.Random (mkStdGen)
 --
 -- For example, we use a linear regression model for the mean temperature
 --
---    t = base + change * x,
+--    t = base + change * i,
 --
 -- where
 --
 -- - 'base' is the mean temperature at the first measurement;
 --
--- - 'x' is the running index from 0 to n with 'n' being the number of observations;
+-- - 'i' is the running index from 0 to n with 'n' being the number of observations;
 --
--- - 'change' is the change of temperature with time.
+-- - 'change' is the change of temperature with index (think /time/).
 data I = I
   { -- Temperature mean (constant and change) and standard deviation in degree
-    -- celsius of temperature.
+    -- celsius.
     _tMeanBase :: !Double,
     _tMeanChange :: !Double,
     _tStdDev :: !Double
@@ -55,8 +55,6 @@ i0 :: I
 i0 = I {_tMeanBase = 10, _tMeanChange = 0, _tStdDev = 10}
 
 -- | Prior function.
---
--- > type PriorFunctionG a b = a -> Log b
 pr :: PriorFunction I
 pr (I tb tc ts) =
   product'
@@ -65,8 +63,8 @@ pr (I tb tc ts) =
       normal 10 10 ts
     ]
 
--- | For a given set of parameters, calculate the likelihood of observing
--- climate data at a specific day.
+-- | For a given set of parameters, calculate the likelihood of observing one
+-- climate data point.
 lhDay ::
   I ->
   DataPoint ->
@@ -75,11 +73,12 @@ lhDay (I tb tc ts) (DataPoint i _ t) =
   normal (tb + fromIntegral i * tc) ts (realToFrac t)
 
 -- | Likelihood function.
---
--- > type LikelihoodFunctionG a b = a -> Log b
 lh :: ClimateData -> LikelihoodFunction I
 lh (ClimateData xs) x = V.product $ V.map (lhDay x) xs
 
+-- | A 'Cycle' collects a list of proposals performed in one iteration of the
+-- Markov chain. The cycle also defines the order in which the proposals are
+-- executed. The default is random order 'RandomO'.
 cc :: Cycle I
 cc =
   cycleFromList
@@ -107,14 +106,20 @@ monFile = monitorFile "all" monAllParams 2
 mon :: Monitor I
 mon = Monitor monStd [monFile] []
 
+-- | Number of burn-in iterations and the auto tuning interval.
+burnIn :: BurnInSettings
+burnIn = BurnInWithAutoTuning 1500 100
+
+-- | Number of iterations after burn-in.
 nIterations :: Int
 nIterations = 5000
 
+-- | Other settings of the MCMC sampler.
 settings :: Settings
 settings =
   Settings
     (AnalysisName "climate")
-    (BurnInWithAutoTuning 1500 100)
+    burnIn
     (Iterations nIterations)
     (TraceMinimum nIterations)
     Overwrite
@@ -126,7 +131,6 @@ settings =
 sample :: ClimateData -> IO ()
 sample d = do
   let g = mkStdGen 42
-  -- Settings of the Metropolis-Hastings-Green (MHG) algorithm.
   -- Use the MHG (Metropolis-Hastings-Green) algorithm.
   a <- mhg settings pr (lh d) cc mon i0 g
   -- -- Or, use the MC3 algorithm.

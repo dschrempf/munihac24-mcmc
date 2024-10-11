@@ -22,7 +22,7 @@ import Data.Csv (FromRecord, HasHeader (HasHeader), decode)
 import Data.Text (Text)
 import Data.Vector (Vector)
 import Data.Vector qualified as V
-import GHC.Generics
+import GHC.Generics (Generic)
 
 data DataPointRaw = DataPointRaw
   { _indexR :: !Int,
