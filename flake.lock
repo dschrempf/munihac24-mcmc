@@ -75,11 +75,11 @@
         "please": "please"
       },
       "locked": {
-        "lastModified": 1728036006,
-        "narHash": "sha256-iTHs+BcdhNtqbT9VnIr72LGq8PounWQbtv3r0E/hUSY=",
+        "lastModified": 1728291798,
+        "narHash": "sha256-/sZXsWgZouS6IQtdYJGG5XIw+Ko5TdWKMp/+QTSl0/Y=",
         "owner": "dschrempf",
         "repo": "nur-packages",
-        "rev": "2c74edf63811b16a5257f70c25cf2a1b9e10de5b",
+        "rev": "cacfa5f34fd82144c4be8a00274b49b84a4a4ff8",
         "type": "github"
       },
       "original": {
@@ -259,11 +259,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1727802920,
-        "narHash": "sha256-HP89HZOT0ReIbI7IJZJQoJgxvB2Tn28V6XS3MNKnfLs=",
+        "lastModified": 1728492678,
+        "narHash": "sha256-9UTxR8eukdg+XZeHgxW5hQA9fIKHsKCdOIUycTryeVw=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "27e30d177e57d912d614c88c622dcfdb2e6e6515",
+        "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
         "type": "github"
       },
       "original": {
